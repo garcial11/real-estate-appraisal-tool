@@ -101,11 +101,12 @@ function calculateAppraisal() {
     
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
+    const pageHeight = doc.internal.pageSize.height;
     doc.setFontSize(16);
     doc.text("Real Estate Appraisal Report", 10, 10);
     doc.setFontSize(12);
 
-    let yOffset = 20; // Starting y position for property entries in the PDF
+    let yOffset = 20; // Starting y position for property entries
 
     for (let i = 1; i <= numProperties; i++) {
         const description = document.getElementById(`description_${i}`).value;
@@ -129,8 +130,8 @@ function calculateAppraisal() {
 
         const estimatedExpenses = potentialRent * 0.4;
         const estimatedValue = (potentialRent - estimatedExpenses) / (capRate / 12);
-        const valueDifference = estimatedValue - askingPrice; // Difference between potential value and asking price
-        const valueCompMethod = sqFt * sqFtValue; // Value comparison method calculation
+        const valueDifference = estimatedValue - askingPrice;
+        const valueCompMethod = sqFt * sqFtValue;
 
         const formattedRent = potentialRent.toLocaleString("en-US", { style: "currency", currency: "USD" });
         const formattedExpenses = estimatedExpenses.toLocaleString("en-US", { style: "currency", currency: "USD" });
@@ -141,18 +142,22 @@ function calculateAppraisal() {
         const formattedValueComp = valueCompMethod.toLocaleString("en-US", { style: "currency", currency: "USD" });
         const formattedSqFtValue = sqFtValue.toLocaleString("en-US", { style: "currency", currency: "USD" });
 
-        // Add property title with larger, bold font
+        // Check if yOffset has exceeded the page height, and add a new page if necessary
+        if (yOffset + 80 > pageHeight) { // 80 is approximate height per property section
+            doc.addPage();
+            yOffset = 20; // Reset y position for new page
+        }
+
+        // Property title with larger, bold font
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(14); // Increase font size for property title
+        doc.setFontSize(14);
         doc.text(`Property ${i}: ${description}`, 10, yOffset);
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(12); // Reset font size for regular details
+        doc.setFontSize(12);
         yOffset += 10;
 
-        // Space before bed count details
+        // Property details
         yOffset += 5;
-
-        // Details of bed counts and rent prices
         doc.text(`1-Bed Units: ${oneBedCount} at ${oneBedRent.toLocaleString("en-US", { style: "currency", currency: "USD" })} each`, 10, yOffset);
         yOffset += 10;
         doc.text(`2-Bed Units: ${twoBedCount} at ${twoBedRent.toLocaleString("en-US", { style: "currency", currency: "USD" })} each`, 10, yOffset);
@@ -162,10 +167,7 @@ function calculateAppraisal() {
         doc.text(`4-Bed Units: ${fourBedCount} at ${fourBedRent.toLocaleString("en-US", { style: "currency", currency: "USD" })} each`, 10, yOffset);
         yOffset += 10;
 
-        // Space before cap rate
         yOffset += 5;
-
-        // Potential Rent and Estimated Values
         doc.text(`Potential Rent (Monthly): ${formattedRent}`, 10, yOffset);
         yOffset += 10;
         doc.text(`Estimated Expenses: ${formattedExpenses}`, 10, yOffset);
@@ -176,8 +178,7 @@ function calculateAppraisal() {
         yOffset += 10;
         doc.text(`Asking Price: ${formattedAskingPrice}`, 10, yOffset);
         yOffset += 10;
-        
-        // Difference, Value Comp Method, and Sq Ft Value in bold
+
         doc.setFont("helvetica", "bold");
         doc.text(`Difference (Estimated - Asking): ${formattedDifference}`, 10, yOffset);
         yOffset += 10;
@@ -185,14 +186,15 @@ function calculateAppraisal() {
         yOffset += 10;
         doc.text(`Sq Ft Value of Similar Properties: ${formattedSqFtValue}`, 10, yOffset);
         doc.setFont("helvetica", "normal");
-        
+
         yOffset += 10;
         doc.text(`Cap Rate: ${formattedCapRate}`, 10, yOffset);
         yOffset += 10;
         doc.text(`Square Footage: ${sqFt} sq. ft.`, 10, yOffset);
-        
+
         yOffset += 20; // Space between properties
     }
 
     doc.save("Real_Estate_Appraisal_Report.pdf");
 }
+
