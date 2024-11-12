@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Appraisal Tool</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Real Estate Appraisal Tool</h1>
+        
+        <label for="numProperties">Number of Properties:</label>
+        <input type="number" id="numProperties" min="1" placeholder="Enter number of properties">
+        <button id="continueButton" onclick="generatePropertyForms()">Continue</button>
+
+        <div id="propertyFormsContainer"></div>
+        <!-- Hidden initially, will show after generating forms -->
+        <button id="calculateButton" style="display: none;" onclick="calculateAppraisal()">Calculate Appraisal</button>
+    </div>
+</body>
+</html>
